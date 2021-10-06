@@ -2,16 +2,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PowerUp : MonoBehaviour
+public class EnemyDrop : MonoBehaviour
 {
     private Rigidbody2D rb;
 
-    [SerializeField]
-    private float fallSpeed = 0.4f;
+    private float fallSpeed = 0.8f;
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        fallSpeed = Random.Range(0.8f, 1.6f);
     }
 
     private void FixedUpdate()
@@ -19,5 +19,4 @@ public class PowerUp : MonoBehaviour
         rb.velocity = (transform.up * -1) * fallSpeed;
 
     }
-
 }

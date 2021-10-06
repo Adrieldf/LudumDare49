@@ -5,10 +5,12 @@ using UnityEngine;
 public class Spaceship : MonoBehaviour
 {
     private Rigidbody2D rb;
+    private AudioSource audioSource;
     private float horizontal;
     private float vertical;
     private float cooldownCounter = 0f;
-    private float[] firingCooldown = { 1.5f, 1.2f, 1f, 0.7f, 0.5f, 0.4f, 0.4f };// 7 
+    private float[] firingCooldown = { 1.25f, 1.1f, 0.9f, 0.7f, 0.5f, 0.4f, 0.4f };// 7 
+    private bool isDead = false;
     [SerializeField]
     private float speed = 10f;
     [SerializeField]
@@ -25,35 +27,45 @@ public class Spaceship : MonoBehaviour
     private int powerLevel = 1;
     [SerializeField]
     private GameObject smoke;
+    [SerializeField]
+    private GameObject sprite;
+    [SerializeField]
+    private AudioClip pew;
+    [SerializeField]
+    private AudioClip puff;
 
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("PowerUp"))
         {
+            GameController.Instance.PlayTaDa();
             Destroy(collision.gameObject);
             GameController.Instance.AddScore(GameController.Enemies.PowerUp);
             if (powerLevel < 7)
                 powerLevel++;
-            
-
         }
         if (collision.gameObject.CompareTag("Bug"))
         {
-            //die
-
             Instantiate(smoke, gameObject.transform.position, Quaternion.identity);
+            isDead = true;
+            StartCoroutine(Die());
+            sprite.SetActive(false);
+
+            audioSource.clip = puff;
+            audioSource.Play();
         }
     }
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        audioSource = GetComponent<AudioSource>();
     }
 
     void Update()
     {
-        if (GameController.Instance.GameIsPaused)
+        if (GameController.Instance.GameIsPaused || isDead)
             return;
 
         horizontal = Input.GetAxisRaw("Horizontal");
@@ -74,6 +86,9 @@ public class Spaceship : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (isDead)
+            return;
+
         float movementH = horizontal * speed;
         float movementV = vertical * (speed / 1.8f);
 
@@ -163,8 +178,15 @@ public class Spaceship : MonoBehaviour
             default:
                 break;
         }
-
+        audioSource.clip = pew;
+        audioSource.Play();
 
         cooldownCounter = firingCooldown[powerLevel - 1];
+    }
+
+    IEnumerator Die()
+    {
+        yield return new WaitForSeconds(1f);
+        GameController.Instance.ShowDeathMenu();
     }
 }

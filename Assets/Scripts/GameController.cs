@@ -11,11 +11,24 @@ public class GameController : MonoBehaviour
     public int BugsEliminated;
     public int Score;
     public bool GameIsPaused = false;
+    public GameObject PowerUp;
 
     [SerializeField]
     private TextMeshProUGUI scoreText;
     [SerializeField]
     private GameObject pauseMenu;
+    [SerializeField]
+    private GameObject deathMenu;
+    [SerializeField]
+    private GameObject completeMenu;
+    [SerializeField]
+    private TextMeshProUGUI deathMenuScore;
+    [SerializeField]
+    private TextMeshProUGUI deathMenuHighScore;
+    [SerializeField]
+    private AudioClip taDa;
+
+    private AudioSource audioSource;
 
     private void Awake()
     {
@@ -24,9 +37,12 @@ public class GameController : MonoBehaviour
 
     void Start()
     {
+        audioSource = GetComponent<AudioSource>();
         BugsEliminated = 0;
         Score = 0;
+        scoreText.text = Score.ToString();
         pauseMenu.SetActive(false);
+        deathMenu.SetActive(false);
         UnpauseGame();
     }
 
@@ -51,6 +67,7 @@ public class GameController : MonoBehaviour
     }
     public void AddScore(Enemies enemy)
     {
+        CountBugsKilled(enemy);
         switch (enemy)
         {
             case Enemies.Redbug:
@@ -77,18 +94,60 @@ public class GameController : MonoBehaviour
         Score += value;
         scoreText.text = Score.ToString();
     }
-
+    private void CountBugsKilled(Enemies enemy)
+    {
+        switch (enemy)
+        {
+            case Enemies.Redbug:
+            case Enemies.Pinkbug:
+            case Enemies.Orangebug:
+            case Enemies.Purplebug:
+                BugsEliminated++;
+                break;
+            case Enemies.PowerUp:
+                break;
+            default:
+                break;
+        }
+    }
+    public void ShowDeathMenu()
+    {
+        PauseGame();
+        deathMenuScore.text = Score.ToString();
+        int hs = PlayerPrefs.GetInt("HighScore", 0);
+        if (Score > hs)
+        {
+            hs = Score;
+            PlayerPrefs.SetInt("HighScore", hs);
+        }
+        deathMenuHighScore.text = hs.ToString();
+        deathMenu.SetActive(true);
+    }
+    public void CompleteGame()
+    {
+        PauseGame();
+        completeMenu.SetActive(true);
+    }
+    public void PlayTaDa()
+    {
+        audioSource.clip = taDa;
+        audioSource.Play();
+    }
 
     public void onContinueClick()
     {
         pauseMenu.SetActive(false);
         UnpauseGame();
-
     }
     public void onMainMenuClick()
     {
         SceneManager.LoadScene("MainMenu");
     }
+    public void onRestartClick()
+    {
+        SceneManager.LoadScene("Game");
+    }
+
     public enum Enemies
     {
         Redbug,
