@@ -27,6 +27,10 @@ public class GameController : MonoBehaviour
     private TextMeshProUGUI deathMenuHighScore;
     [SerializeField]
     private AudioClip taDa;
+    [SerializeField]
+    private TextMeshProUGUI completeMenuScore;
+    [SerializeField]
+    private TextMeshProUGUI completeMenuHighScore;
 
     private AudioSource audioSource;
 
@@ -125,7 +129,16 @@ public class GameController : MonoBehaviour
     }
     public void CompleteGame()
     {
+        PlayTaDa();
         PauseGame();
+        completeMenuScore.text = Score.ToString();
+        int hs = PlayerPrefs.GetInt("HighScore", 0);
+        if (Score > hs)
+        {
+            hs = Score;
+            PlayerPrefs.SetInt("HighScore", hs);
+        }
+        completeMenuHighScore.text = hs.ToString();
         completeMenu.SetActive(true);
     }
     public void PlayTaDa()

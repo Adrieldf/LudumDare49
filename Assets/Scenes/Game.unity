@@ -5125,6 +5125,8 @@ MonoBehaviour:
   deathMenuScore: {fileID: 1081801382}
   deathMenuHighScore: {fileID: 1301711248}
   taDa: {fileID: 8300000, guid: 1f127c8d313784545b303ce2656dccd5, type: 3}
+  completeMenuScore: {fileID: 210713987}
+  completeMenuHighScore: {fileID: 1666838077}
 --- !u!4 &1636296341
 Transform:
   m_ObjectHideFlags: 0
